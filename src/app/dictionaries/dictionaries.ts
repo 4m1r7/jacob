@@ -1,9 +1,8 @@
-import 'server-only'
- 
-const dictionaries = {
-  en: () => import('@/app/dictionaries/en.json').then((module) => module.default),
-  fa: () => import('@/app/dictionaries/fa.json').then((module) => module.default),
+import en from '@/app/dictionaries/en.json';
+import fa from '@/app/dictionaries/fa.json';
+
+const dictionaries = { en, fa };
+
+export function getDictionary(locale: 'en' | 'fa') {
+  return dictionaries[locale];
 }
- 
-export const getDictionary = async (locale: 'en' | 'fa') =>
-  dictionaries[locale]()

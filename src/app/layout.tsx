@@ -29,11 +29,6 @@ const mirza = localFont({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Jacob Carpet",
-  description: "Jacob Carpet Store",
-};
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html>

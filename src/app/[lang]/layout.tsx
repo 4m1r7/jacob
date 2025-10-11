@@ -9,12 +9,12 @@ export async function generateStaticParams() {
 
 type Props = {
   children: React.ReactNode;
-  params: Promise<{ lang: Languages }>;
-}
+  params: any;
+};
 
-export default async function RootLayout({ children, params }: Props) {
-  const { lang } = (await params);
-  const dict = await getDictionary(lang);
+export default function RootLayout({ children, params }: Props) {
+  const { lang } = params as { lang: Languages };
+  const dict = getDictionary(lang);
 
   return (
     <main dir={lang === "fa" ? "rtl" : "ltr"} className="relative bg-customLightSand">
