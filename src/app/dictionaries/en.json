@@ -1,0 +1,13 @@
+{
+  "menu": {
+    "products": "Products"
+  },
+  "products": {
+    "carpets": "Carpets",
+    "klims": "Klims",
+    "bags": "Bags"
+  },
+  "footer": {
+    "notice": "All rights reserved for Jacob carpet store"
+  }
+}

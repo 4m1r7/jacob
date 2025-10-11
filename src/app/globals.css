@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+	--color-customLightSand: #D9D9D9;
+}
 
-@utility font-Vazirmatn {
-  font-family: var(--font-vazirmatn), sans-serif;
+@utility font-Mirza {
+  font-family: var(--font-mirza), sans-serif;
 }
