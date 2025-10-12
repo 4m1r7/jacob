@@ -42,7 +42,7 @@ export default function Header({ lang, dict }: pageProps) {
           boxShadow: "0 0 0 rgba(0,0,0,0)",
         }}
         animate={{
-          backgroundColor: scrolled ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)",
+          backgroundColor: scrolled ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0)",
           borderColor: scrolled ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0)",
           boxShadow: scrolled ? "0 4px 12px rgba(0,0,0,0.15)" : "0 0 0 rgba(0,0,0,0)",
         }}
@@ -56,18 +56,18 @@ export default function Header({ lang, dict }: pageProps) {
       >
 
         {/* Logo */}
-        <div className="w-[5vw] h-[3vw] flex justify-center items-center relative">
+        <div className="flex justify-center items-center relative">
           <img
             src="/logo.svg"
             alt="logo"
-            className="w-[5vw] opacity-0"
+            className="w-[3vw] opacity-0"
           />
           {scrolled && (
             <motion.img
               layoutId="main-logo"
               src="/logo.svg"
               alt="logo"
-              className="absolute w-[5vw]"
+              className="absolute w-[3vw]"
               transition={{ duration: .75, ease: "easeInOut" }}
             />
           )}
@@ -81,18 +81,14 @@ export default function Header({ lang, dict }: pageProps) {
               href={`/${lang}/${item.link}`}
               className="text-2xl text-white leading-none tracking-widest font-Mirza rtl:tracking-normal"
             >
-              <span className="flex translate-y-[15%]">
-                {menusStrings[item.title]}
-              </span>
+              {menusStrings[item.title]}
             </Link>
           ))}
           <Link
             href={switchPath}
             className="text-2xl text-white font-Mirza leading-none tracking-widest ltr:tracking-normal"
           >
-            <span className="flex translate-y-[15%]">
-              {{ en: 'فارسی', fa: 'English' }[lang]}
-            </span>
+            {{ en: 'فارسی', fa: 'English' }[lang]}
           </Link>
         </nav>
       </motion.div>

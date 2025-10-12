@@ -80,7 +80,7 @@ export default function Home({ dict }: officeProps) {
             <Link
               href={cat.link}
               key={idx}
-              className="w-full flex justify-between items-center py-14 px-16 rounded-full overflow-hidden relative group"
+              className="w-full flex justify-between items-center py-10 px-16 rounded-full overflow-hidden relative group"
             >
               {/* Background image */}
               <img src={cat.image} alt={cat.title} className="absolute top-0 left-0 w-full h-full object-cover" />
@@ -90,10 +90,8 @@ export default function Home({ dict }: officeProps) {
                 <img src="/ornament.svg" alt={cat.title} className="w-12 invert opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 {/* Category name */}
-                <h3 className="text-6xl text-white font-Mirza leading-none">
-                  <span className="flex translate-y-[15%]">
-                    {dict.products[cat.title]}
-                  </span>
+                <h3 className="text-5xl text-white font-Mirza leading-none">
+                  {dict.products[cat.title]}
                 </h3>
                 
                 {/* Ornament */}

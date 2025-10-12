@@ -14,10 +14,8 @@ export default function Header({ title, logo }: pageProps) {
       {logo ? (
         <img src="/logo.svg" alt="" className="w-56 invert px-20 py-3 rounded-full border-[1px] border-white" />
       ) : (
-        <h2 className="text-5xl font-Mirza font-medium px-16 py-5 rounded-full border-[1px] border-black">
-          <span className="flex translate-y-[15%]">
-            {title}
-          </span>
+        <h2 className="text-3xl font-Mirza font-medium px-16 py-5 rounded-full border-[1px] border-black">
+          {title}
         </h2>
       )}
 
