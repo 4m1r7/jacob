@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link";
-// import Logo from "./Logo";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useState } from "react";
 import { menu } from "@/lib/navigation";
 import { Languages, Dictionary } from "@/types";
 import { usePathname } from "next/navigation";
@@ -21,16 +22,59 @@ export default function Header({ lang, dict }: pageProps) {
   // Get the main menu strings
   const menusStrings = dict.menu;
 
-  return(
-    <div className="w-full fixed top-0 left-0 px-10 pt-8 z-40">
+  // Scroll logic
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 50);
+  });
 
-      <div className="flex justify-between items-center px-10 py-4 bg-black/30 backdrop-blur-sm border-[1px] border-white/20 rounded-full">
+  return(
+    <motion.header
+      className="w-full fixed top-0 left-0 px-10 pt-8 z-40"
+      initial={false}
+    >
+
+      <motion.div
+        initial={{
+          backgroundColor: "rgba(0,0,0,0)",
+          borderColor: "rgba(255,255,255,0)",
+          boxShadow: "0 0 0 rgba(0,0,0,0)",
+        }}
+        animate={{
+          backgroundColor: scrolled ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0)",
+          borderColor: scrolled ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0)",
+          boxShadow: scrolled ? "0 4px 12px rgba(0,0,0,0.15)" : "0 0 0 rgba(0,0,0,0)",
+        }}
+        transition={{
+          duration: scrolled ? 0.3 : 0.1,
+          ease: "linear",
+        }}
+        className={`flex justify-between items-center px-10 py-4 border rounded-full transition-all ${
+          scrolled ? "backdrop-blur-xs duration-200" : "backdrop-blur-0 duration-75"
+        }`}
+      >
 
         {/* Logo */}
-        <img src="/logo.svg" alt="" className="w-[5%]" />
+        <div className="w-[5vw] h-[3vw] flex justify-center items-center relative">
+          <img
+            src="/logo.svg"
+            alt="logo"
+            className="w-[5vw] opacity-0"
+          />
+          {scrolled && (
+            <motion.img
+              layoutId="main-logo"
+              src="/logo.svg"
+              alt="logo"
+              className="absolute w-[5vw]"
+              transition={{ duration: .75, ease: "easeInOut" }}
+            />
+          )}
+        </div>
 
         {/* Menu */}
-        <nav className="h-fit flex gap-6 items-end">
+        <nav className="w-fit flex items-center gap-6">
           {menu.map((item) => (
             <Link
               key={item.link}
@@ -42,16 +86,16 @@ export default function Header({ lang, dict }: pageProps) {
               </span>
             </Link>
           ))}
-            <Link
-              href={switchPath}
-              className="text-2xl text-white font-Mirza leading-none tracking-widest ltr:tracking-normal"
-            >
-              <span className="flex translate-y-[15%]">
-                {{ en: 'فارسی', fa: 'English' }[lang]}
-              </span>
-            </Link>
+          <Link
+            href={switchPath}
+            className="text-2xl text-white font-Mirza leading-none tracking-widest ltr:tracking-normal"
+          >
+            <span className="flex translate-y-[15%]">
+              {{ en: 'فارسی', fa: 'English' }[lang]}
+            </span>
+          </Link>
         </nav>
-      </div>
-    </div>
+      </motion.div>
+    </motion.header>
   )
 }

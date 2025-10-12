@@ -1,12 +1,14 @@
 'use client';
 
 import Link from "next/link";
-import SectionDivider from '@/components/SectionDivider';
-import { productCategories } from '@/lib/productCategories';
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from "swiper/modules";
 import 'swiper/css';
+import SectionDivider from '@/components/SectionDivider';
+import { productCategories } from '@/lib/productCategories';
 import { Dictionary } from "@/types";
+import { useState } from "react";
 
 type officeProps = {
   dict: Dictionary;
@@ -14,12 +16,19 @@ type officeProps = {
 
 
 export default function Home({ dict }: officeProps) {
+
+  // Scroll logic
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 50);
+  });
   
   return (
     <div>
 
       {/* Hero */}
-      <div className="w-full aspect-[2.5/1] relative">
+      <div className="w-full aspect-[2.5/1] flex justify-center items-center relative">
         <Swiper
           modules={[Autoplay]}
           slidesPerView={1}
@@ -49,6 +58,17 @@ export default function Home({ dict }: officeProps) {
 
         {/* Background overlay */}
         <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+
+        {/* Logo */}
+        {!scrolled && (
+          <motion.img
+            layoutId="main-logo"
+            src="/logo.svg"
+            alt="hero logo"
+            className="absolute w-[25vw] max-w-[400px] z-10"
+            transition={{ duration: 0.75, ease: "easeInOut" }}
+          />
+        )}
       </div>
 
 
