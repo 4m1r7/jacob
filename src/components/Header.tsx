@@ -43,11 +43,11 @@ export default function Header({ lang, dict }: pageProps) {
           backgroundColor: scrolled ? "rgba(217, 217, 217, 1)" : "rgba(0,0,0,0)",
         }}
         transition={{
-          duration: scrolled ? 0.3 : 0.1,
+          duration: 0.1,
           ease: "linear",
         }}
-        className={`flex justify-between items-center px-10 py-4 transition-all border-b-[.5px] border-black/40 ${
-          scrolled ? "duration-200" : "duration-75"
+        className={`flex justify-between items-center px-10 transition-all border-black ${
+          scrolled ? "border-b-[.5px] duration-200" : "border-b-0 duration-75"
         }`}
       >
 
@@ -56,7 +56,7 @@ export default function Header({ lang, dict }: pageProps) {
           <img
             src="/logo.svg"
             alt="logo"
-            className="w-[3vw] opacity-0"
+            className="w-[5vw] opacity-0"
           />
           {scrolled && (
             <motion.img
