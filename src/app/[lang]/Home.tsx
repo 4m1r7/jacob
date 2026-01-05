@@ -75,7 +75,7 @@ export default function Home({ dict }: officeProps) {
       {/* Page Content */}
       <div className="flex flex-col items-center gap-20 px-40 pt-20">
         <SectionDivider title={dict.menu.products} />
-        <div className="w-full flex flex-col gap-5 px-32">
+        <div className="w-full flex flex-col gap-5 px-20">
           {productCategories.map((cat, idx) => (
             <Link
               href={cat.link}

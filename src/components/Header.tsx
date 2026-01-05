@@ -46,7 +46,7 @@ export default function Header({ lang, dict }: pageProps) {
           duration: scrolled ? 0.3 : 0.1,
           ease: "linear",
         }}
-        className={`flex justify-between items-center px-10 py-4 transition-all ${
+        className={`flex justify-between items-center px-10 py-4 transition-all border-b-[.5px] border-black/40 ${
           scrolled ? "duration-200" : "duration-75"
         }`}
       >
