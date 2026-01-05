@@ -31,27 +31,23 @@ export default function Header({ lang, dict }: pageProps) {
 
   return(
     <motion.header
-      className="w-full fixed top-0 left-0 px-10 pt-8 z-40"
+      className="w-full fixed top-0 left-0 z-40"
       initial={false}
     >
 
       <motion.div
         initial={{
           backgroundColor: "rgba(0,0,0,0)",
-          borderColor: "rgba(255,255,255,0)",
-          boxShadow: "0 0 0 rgba(0,0,0,0)",
         }}
         animate={{
-          backgroundColor: scrolled ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0)",
-          borderColor: scrolled ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0)",
-          boxShadow: scrolled ? "0 4px 12px rgba(0,0,0,0.15)" : "0 0 0 rgba(0,0,0,0)",
+          backgroundColor: scrolled ? "rgba(217, 217, 217, 1)" : "rgba(0,0,0,0)",
         }}
         transition={{
           duration: scrolled ? 0.3 : 0.1,
           ease: "linear",
         }}
-        className={`flex justify-between items-center px-10 py-4 border rounded-full transition-all ${
-          scrolled ? "backdrop-blur-xs duration-200" : "backdrop-blur-0 duration-75"
+        className={`flex justify-between items-center px-10 py-4 transition-all ${
+          scrolled ? "duration-200" : "duration-75"
         }`}
       >
 
@@ -67,7 +63,7 @@ export default function Header({ lang, dict }: pageProps) {
               layoutId="main-logo"
               src="/logo.svg"
               alt="logo"
-              className="absolute w-[3vw]"
+              className="absolute w-[3vw] brightness-0 saturate-100"
               transition={{ duration: .75, ease: "easeInOut" }}
             />
           )}
@@ -79,14 +75,18 @@ export default function Header({ lang, dict }: pageProps) {
             <Link
               key={item.link}
               href={`/${lang}/${item.link}`}
-              className="text-2xl text-white leading-none tracking-widest font-Mirza rtl:tracking-normal"
+              className={`text-2xl leading-none tracking-widest font-Mirza rtl:tracking-normal
+                  ${scrolled ? 'text-black' : 'text-white'}
+                `}
             >
               {menusStrings[item.title]}
             </Link>
           ))}
           <Link
             href={switchPath}
-            className="text-2xl text-white font-Mirza leading-none tracking-widest ltr:tracking-normal"
+            className={`text-2xl font-Mirza leading-none tracking-widest ltr:tracking-normal
+                ${scrolled ? 'text-black' : 'text-white'}
+              `}
           >
             {{ en: 'فارسی', fa: 'English' }[lang]}
           </Link>
