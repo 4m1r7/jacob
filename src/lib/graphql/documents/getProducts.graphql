@@ -1,0 +1,48 @@
+query GetProducts($first: Int, $after: String) {
+  products(first: $first, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        databaseId
+        title
+        slug
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        productDetail {
+          price
+          condition
+          soldOut
+          type
+          width
+          length
+        }
+        origin {
+          edges {
+            node {
+              id
+              databaseId
+              name
+              slug
+              parent {
+                node {
+                  id
+                  databaseId
+                  name
+                  slug
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

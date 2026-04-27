@@ -23,13 +23,13 @@ export default function Footer({ lang, dict }: pageProps) {
       {/* Socials */}
       <div className="flex gap-16">
         <a href="" target="_blank" className="w-20 aspect-square p-5 border-[1px] border-black rounded-full">
-          <img src="socials/email.svg" alt="" className="" />
+          <img src="/socials/email.svg" alt="" className="" />
         </a>
         <a href="" target="_blank" className="w-20 aspect-square p-5 border-[1px] border-black rounded-full">
-          <img src="socials/youtube.svg" alt="" className="" />
+          <img src="/socials/youtube.svg" alt="" className="" />
         </a>
         <a href="" target="_blank" className="w-20 aspect-square p-5 border-[1px] border-black rounded-full">
-          <img src="socials/instagram.svg" alt="" className="" />
+          <img src="/socials/instagram.svg" alt="" className="" />
         </a>
       </div>
 

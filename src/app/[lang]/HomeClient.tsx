@@ -15,7 +15,7 @@ type officeProps = {
 }
 
 
-export default function Home({ dict }: officeProps) {
+export default function HomeClient({ dict }: officeProps) {
 
   // Scroll logic
   const { scrollY } = useScroll();

@@ -18,6 +18,7 @@ export default function Header({ lang, dict }: pageProps) {
   const pathname = usePathname();
   const [_empty, _currentLang, ...rest] = pathname.split('/');
   const switchPath = `/${{ en: 'fa', fa: 'en' }[lang]}/${rest.join('/')}`;
+  const isHome = rest.length === 0 || rest.join('/') === '';
 
   // Get the main menu strings
   const menusStrings = dict.menu;
@@ -28,6 +29,8 @@ export default function Header({ lang, dict }: pageProps) {
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 50);
   });
+
+  const showScrolled = !isHome || scrolled;
 
   return(
     <motion.header
@@ -40,34 +43,34 @@ export default function Header({ lang, dict }: pageProps) {
           backgroundColor: "rgba(0,0,0,0)",
         }}
         animate={{
-          backgroundColor: scrolled ? "rgba(217, 217, 217, 1)" : "rgba(0,0,0,0)",
+          backgroundColor: showScrolled ? "rgba(217, 217, 217, 1)" : "rgba(0,0,0,0)",
         }}
         transition={{
           duration: 0.1,
           ease: "linear",
         }}
         className={`flex justify-between items-center px-10 transition-all border-black ${
-          scrolled ? "border-b-[.5px] duration-200" : "border-b-0 duration-75"
+          showScrolled ? "border-b-[.5px] duration-200" : "border-b-0 duration-75"
         }`}
       >
 
         {/* Logo */}
-        <div className="flex justify-center items-center relative">
+        <Link href={`/${lang}`} className="flex justify-center items-center relative">
           <img
             src="/logo.svg"
             alt="logo"
             className="w-[5vw] opacity-0"
           />
-          {scrolled && (
+          {showScrolled && (
             <motion.img
               layoutId="main-logo"
               src="/logo.svg"
               alt="logo"
               className="absolute w-[3vw] brightness-0 saturate-100"
-              transition={{ duration: .75, ease: "easeInOut" }}
+              transition={{ duration: showScrolled ? .75 : 0, ease: "easeInOut" }}
             />
           )}
-        </div>
+        </Link>
 
         {/* Menu */}
         <nav className="w-fit flex items-center gap-6">
@@ -76,7 +79,7 @@ export default function Header({ lang, dict }: pageProps) {
               key={item.link}
               href={`/${lang}/${item.link}`}
               className={`text-2xl leading-none tracking-widest font-Mirza rtl:tracking-normal
-                  ${scrolled ? 'text-black' : 'text-white'}
+                  ${showScrolled ? 'text-black' : 'text-white'}
                 `}
             >
               {menusStrings[item.title]}
@@ -85,7 +88,7 @@ export default function Header({ lang, dict }: pageProps) {
           <Link
             href={switchPath}
             className={`text-2xl font-Mirza leading-none tracking-widest ltr:tracking-normal
-                ${scrolled ? 'text-black' : 'text-white'}
+                ${showScrolled ? 'text-black' : 'text-white'}
               `}
           >
             {{ en: 'فارسی', fa: 'English' }[lang]}

@@ -10,7 +10,14 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@graphql-codegen/cli": "^6.3.1",
+    "@graphql-codegen/typescript": "^5.0.10",
+    "@graphql-codegen/typescript-graphql-request": "^7.0.1",
+    "@graphql-codegen/typescript-operations": "^5.1.0",
     "framer-motion": "^12.23.24",
+    "graphql": "^16.13.2",
+    "graphql-request": "^7.4.0",
+    "graphql-tag": "^2.12.6",
     "next": "^16.1.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",

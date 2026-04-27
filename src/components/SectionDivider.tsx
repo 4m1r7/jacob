@@ -1,13 +1,14 @@
 type pageProps = {
   title: string;
+  classes?: string;
   logo?: boolean;
 }
 
-export default function Header({ title, logo }: pageProps) {
+export default function Header({ title, logo, classes }: pageProps) {
 
   return(
-    <div className="w-full flex items-center">
-      <img src="ornament.svg" alt="" className="w-12" />
+    <div className={`w-full flex items-center ${classes ? classes : ''}`}>
+      <img src="/ornament.svg" alt="" className="w-12" />
 
       <div className="flex-grow h-[1px] bg-black" />
 
@@ -21,7 +22,7 @@ export default function Header({ title, logo }: pageProps) {
 
       <div className="flex-grow h-[1px] bg-black" />
 
-      <img src="ornament.svg" alt="" className="w-12" />
+      <img src="/ornament.svg" alt="" className="w-12" />
     </div>
   )
 }

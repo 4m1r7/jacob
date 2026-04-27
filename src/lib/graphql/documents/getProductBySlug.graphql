@@ -1,0 +1,54 @@
+query GetProductBySlug($slug: String!) {
+  products(first: 1, where: { name: $slug }) {
+    edges {
+      node {
+        id
+        databaseId
+        title
+        slug
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        origin {
+          edges {
+            node {
+              id
+              databaseId
+              name
+              slug
+              parent {
+                node {
+                  id
+                  databaseId
+                  name
+                  slug
+                }
+              }
+            }
+          }
+        }
+        productDetail {
+          price
+          soldOut
+          length
+          width
+          weight
+          type
+          condition
+          englishDescription
+          farsiDescription
+          pile
+          warp
+          weft
+          gallery {
+            id
+            fullFileUrl
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+query GetSiteSettings {
+  generalSettings {
+    title
+    description
+    url
+  }
+}

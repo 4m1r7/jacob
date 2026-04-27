@@ -1,0 +1,13 @@
+query GetOrigins {
+  allOrigin(first: 100, where: { hideEmpty: true }) {
+    edges {
+      node {
+        id
+        databaseId
+        name
+        slug
+        parentDatabaseId
+      }
+    }
+  }
+}

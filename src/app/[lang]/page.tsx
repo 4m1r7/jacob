@@ -1,4 +1,4 @@
-import Home from './Home'
+import HomeClient from './HomeClient'
 import { getDictionary } from '../dictionaries/dictionaries';
 import { Languages } from '@/types';
 
@@ -11,5 +11,5 @@ export default async function Page({ params }: { params: Promise<{ lang: Languag
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  return <Home dict={dict} />;
+  return <HomeClient dict={dict} />;
 }
