@@ -13436,7 +13436,7 @@ export type GetProductBySlugQueryVariables = Exact<{
 }>;
 
 
-export type GetProductBySlugQuery = { __typename?: 'RootQuery', products?: { __typename?: 'RootQueryToProductConnection', edges: Array<{ __typename?: 'RootQueryToProductConnectionEdge', node: { __typename?: 'Product', id: string, databaseId: number, title?: string | null, slug?: string | null, featuredImage?: { __typename?: 'NodeWithFeaturedImageToMediaItemConnectionEdge', node: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } } | null, origin?: { __typename?: 'ProductToOriginConnection', edges: Array<{ __typename?: 'ProductToOriginConnectionEdge', node: { __typename?: 'Origin', id: string, databaseId: number, name?: string | null, slug?: string | null, parent?: { __typename?: 'OriginToParentOriginConnectionEdge', node: { __typename?: 'Origin', id: string, databaseId: number, name?: string | null, slug?: string | null } } | null } }> } | null, productDetail?: { __typename?: 'ProductDetail', price?: number | null, soldOut?: Array<string | null> | null, length?: number | null, width?: number | null, weight?: number | null, type?: string | null, condition?: string | null, englishDescription?: string | null, farsiDescription?: string | null, pile?: string | null, warp?: string | null, weft?: string | null, gallery?: Array<{ __typename?: 'ACF_Galerie_4', id?: string | null, fullFileUrl?: string | null } | null> | null } | null } }> } | null };
+export type GetProductBySlugQuery = { __typename?: 'RootQuery', products?: { __typename?: 'RootQueryToProductConnection', edges: Array<{ __typename?: 'RootQueryToProductConnectionEdge', node: { __typename?: 'Product', id: string, databaseId: number, title?: string | null, slug?: string | null, featuredImage?: { __typename?: 'NodeWithFeaturedImageToMediaItemConnectionEdge', node: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } } | null, origin?: { __typename?: 'ProductToOriginConnection', edges: Array<{ __typename?: 'ProductToOriginConnectionEdge', node: { __typename?: 'Origin', id: string, databaseId: number, name?: string | null, slug?: string | null, parent?: { __typename?: 'OriginToParentOriginConnectionEdge', node: { __typename?: 'Origin', id: string, databaseId: number, name?: string | null, slug?: string | null } } | null } }> } | null, productDetail?: { __typename?: 'ProductDetail', price?: number | null, soldOut?: Array<string | null> | null, length?: number | null, width?: number | null, weight?: number | null, type?: string | null, condition?: string | null, englishDescription?: string | null, farsiDescription?: string | null, pile?: string | null, warp?: string | null, weft?: string | null, gallery?: Array<{ __typename?: 'ACF_Galerie_4', id?: string | null, fullFileUrl?: string | null, fullHeight?: number | null, fullWidth?: number | null } | null> | null } | null } }> } | null };
 
 export type GetProductsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -13516,6 +13516,8 @@ export const GetProductBySlugDocument = gql`
           gallery {
             id
             fullFileUrl
+            fullHeight
+            fullWidth
           }
         }
       }

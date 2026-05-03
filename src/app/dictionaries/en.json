@@ -60,11 +60,13 @@
     "conditionAntique": "Antique",
     "conditionSemiAntique": "Semi-antique",
     "conditionNew": "New",
+    "getInTouch": "Get in tounch",
+    "getInTouchCopy": "Contact us on <a href='https://wa.me/+9891220368203' target='_blank' class='flex items-center gap-2 inline' style='filter: brightness(0) saturate(100%) invert(45%) sepia(58%) saturate(6698%) hue-rotate(154deg) brightness(90%) contrast(86%);'><img src='/socials/whatsapp.svg' alt='' class='w-4 inline translate-y-[-10%]' /> Whatsapp</a> to order this piece or get more information.",
     "cm": "cm",
     "kg": "kg",
     "usd": "USD"
   },
   "footer": {
-    "notice": "All rights reserved for Jacob carpet store"
+    "notice": "All rights reserved for Jacob carpet store © 2026"
   }
 }

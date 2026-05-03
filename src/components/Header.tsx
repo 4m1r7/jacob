@@ -43,7 +43,7 @@ export default function Header({ lang, dict }: pageProps) {
           backgroundColor: "rgba(0,0,0,0)",
         }}
         animate={{
-          backgroundColor: showScrolled ? "rgba(217, 217, 217, 1)" : "rgba(0,0,0,0)",
+          backgroundColor: showScrolled ? "rgba(231, 225, 218, 1)" : "rgba(0,0,0,0)",
         }}
         transition={{
           duration: 0.1,

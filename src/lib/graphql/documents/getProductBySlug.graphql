@@ -46,6 +46,8 @@ query GetProductBySlug($slug: String!) {
           gallery {
             id
             fullFileUrl
+            fullHeight
+            fullWidth
           }
         }
       }

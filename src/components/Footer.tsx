@@ -21,7 +21,10 @@ export default function Footer({ lang, dict }: pageProps) {
       <SectionDivider title="" logo={true} />
       
       {/* Socials */}
-      <div className="flex gap-16">
+      <div className="flex gap-8">
+        <a href="https://wa.me/+9891220368203" target="_blank" className="w-20 aspect-square p-5 border-[1px] border-black rounded-full">
+          <img src="/socials/whatsapp.svg" alt="" className="" />
+        </a>
         <a href="" target="_blank" className="w-20 aspect-square p-5 border-[1px] border-black rounded-full">
           <img src="/socials/email.svg" alt="" className="" />
         </a>

@@ -4,12 +4,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Languages, Dictionary } from '@/types';
 import type { SingleProduct } from '@/lib/graphql/fetchProduct';
-import SectionDivider from '@/components/SectionDivider';
 
 type Props = {
   product: SingleProduct;
   lang: Languages;
   dict: Dictionary;
+};
+
+type GalleryImage = {
+  id: string;
+  fullFileUrl: string;
+  fullWidth: number;
+  fullHeight: number;
 };
 
 function localizeType(value: string | null | undefined, t: Record<string, string>): string {
@@ -59,6 +65,12 @@ export default function ProductDetail({ product, lang, dict }: Props) {
   const displayOrigins = topLevelOrigins.length > 0 ? topLevelOrigins : origins;
 
   const description = lang === 'fa' ? detail?.farsiDescription : detail?.englishDescription;
+  const productTitle = product.title ?? 'Product image';
+  const galleryImages =
+    detail?.gallery?.filter(
+      (img): img is GalleryImage =>
+        Boolean(img?.id && img.fullFileUrl && img.fullWidth != null && img.fullHeight != null),
+    ) ?? [];
 
   return (
     <div className={`min-h-screen pt-24 pb-16 ${isRtl ? 'font-Mirza' : ''}`} dir={isRtl ? 'rtl' : 'ltr'}>
@@ -80,14 +92,15 @@ export default function ProductDetail({ product, lang, dict }: Props) {
 
           {/* Gallery */}
           <div className="w-3/5 flex flex-col gap-4">
-            {detail?.gallery && detail.gallery.length > 0 ? (
-              detail.gallery.map((img, i) => (
-                <div key={img.id} className="relative aspect-square overflow-hidden">
+            {galleryImages.length > 0 ? (
+              galleryImages.map((img, i) => (
+                <div key={img.id} className="relative w-full overflow-hidden">
                   <Image
                     src={img.fullFileUrl}
-                    alt={product.title}
-                    fill
-                    className="object-cover mix-blend-darken"
+                    alt={productTitle}
+                    width={img.fullWidth}
+                    height={img.fullHeight}
+                    className="w-full mix-blend-darken"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     priority={i === 0}
                   />
@@ -113,7 +126,7 @@ export default function ProductDetail({ product, lang, dict }: Props) {
             <div className='w-full flex items-end justify-between'>
               <div className='flex flex-col gap-1'>
                 <div className='text-sm text-stone-500 capitalize'>
-                  #{product.title}
+                  #{product.title ?? '—'}
                 </div>
                 <h1 className="flex items-center gap-2 text-2xl text-stone-800 uppercase">
                   {/* Condition */}
@@ -142,7 +155,7 @@ export default function ProductDetail({ product, lang, dict }: Props) {
                   </span>
                 )}
                 {detail?.price && (
-                  <span className={`text-2xl text-stone-800 text-right font-extralight leading-none tracking-wider ${isSoldOut && 'line-through'}`}>
+                  <span className={`text-2xl text-stone-700 text-right font-extralight leading-none tracking-wider ${isSoldOut && 'line-through'}`}>
                     ${detail.price}
                   </span>
                 )}
@@ -185,6 +198,17 @@ export default function ProductDetail({ product, lang, dict }: Props) {
                   <SpecRow label={t.weft} value={detail?.weft} />
                 </div>
               </div>
+            </div>
+
+            {/* Call to action */}
+            <div className="flex-1 border border-stone-400 rounded-xl overflow-hidden">
+              <div className="px-5 py-3 bg-stone-500 text-xs uppercase tracking-widest text-stone-100 font-semibold">
+                {t.getInTouch}
+              </div>
+              <div
+                className="p-4 text-sm text-stone-500 font-semibold"
+                dangerouslySetInnerHTML={{ __html: t.getInTouchCopy }}
+              />
             </div>
           </div>
         </div>

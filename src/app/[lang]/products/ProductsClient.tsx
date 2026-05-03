@@ -183,7 +183,7 @@ export default function ProductsClient({
       <SectionDivider title={dict.menu.products} classes="px-40 my-10" />
 
       {/* Products */}
-      <div className="px-10 py-5">
+      <div className="px-10 pb-16">
         {isPending ? (
           <ProductGridSkeleton />
         ) : products.length === 0 ? (
@@ -210,9 +210,9 @@ export default function ProductsClient({
       </div>
 
       {/* Filter bar */}
-      <div ref={filterBarRef} className="sticky bottom-0 w-full">
-        <div className="flex">
-          {filterTiles.map((tile) => {
+      <div ref={filterBarRef} className="sticky bottom-1 w-[calc(100vw-2rem)] mx-auto">
+        <div className="flex border border-stone-800 rounded-full bg-customLightSand">
+          {filterTiles.map((tile, idx) => {
             const active = filterIsActive(filters, tile.keys);
             const isOpen = openTile === tile.id;
             const LIST_FILTER = new Set(['type', 'condition', 'origin']);
@@ -222,8 +222,8 @@ export default function ProductsClient({
                 <button
                   type="button"
                   onClick={() => setOpenTile(isOpen ? null : tile.id)}
-                  className="w-full flex flex-col items-center justify-center gap-3 py-3 px-2 bg-stone-200 border border-r-0 border-stone-800 relative
-                    text-xs font-medium text-black cursor-pointer"
+                  className={`w-full flex flex-col items-center justify-center gap-3 py-3 px-2 ${idx != 0 ? "border-l" : ""} border-stone-800 relative
+                    text-xs font-medium text-black cursor-pointer`}
                 >
                   <TileIcon id={tile.id} />
                   <span className="font-semibold leading-none uppercase">{tile.label}</span>
@@ -317,23 +317,13 @@ export default function ProductsClient({
           })}
 
           {/* Apply / Reset */}
-          <div className="flex-1 flex flex-col border border-black">
-            <button
-              type="button"
-              onClick={applyFilters}
-              disabled={isPending}
-              className="flex-1 text-sm text-black font-semibold bg-stone-300 disabled:opacity-50 uppercase"
-            >
-              {isPending ? t.applying : t.applyFilters}
-            </button>
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="flex-1 text-sm text-black font-medium bg-stone-200 border-t border-black uppercase"
-            >
-              {t.resetFilters}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="text-sm text-black/60 hover:text-black/90 font-medium uppercase transition duration-200 px-5 border-l border-black cursor-pointer"
+          >
+            {t.resetFilters}
+          </button>
         </div>
       </div>
     </div>
