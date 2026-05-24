@@ -5,7 +5,7 @@ const endpoint =
   "https://cms.jacobcarpet.com/graphql";
 
 export function createWpGraphqlClient(headers?: HeadersInit) {
-  return new GraphQLClient(endpoint, { headers });
+  return new GraphQLClient(endpoint, { headers, fetch: (url, init) => fetch(url, { ...init, cache: 'no-store' }) });
 }
 
 export const wpGraphqlClient = createWpGraphqlClient();

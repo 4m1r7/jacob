@@ -5,10 +5,6 @@ export type ProductNode = NonNullable<
   NonNullable<GetProductsQuery['products']>['edges'][number]['node']
 >;
 
-export type ProductsPageInfo = NonNullable<
-  NonNullable<GetProductsQuery['products']>['pageInfo']
->;
-
 export type ProductFilters = {
   priceMin?: number;
   priceMax?: number;
@@ -22,10 +18,6 @@ export type ProductFilters = {
   originIds?: number[];
 };
 
-export type FetchProductsResult = {
-  products: ProductNode[];
-  pageInfo: ProductsPageInfo;
-};
 
 type MetaEntry = { key: string; compare: string; value: string; type?: string };
 
@@ -34,11 +26,10 @@ function serializeMetaEntry(e: MetaEntry): string {
   return `{ key: "${e.key}", compare: ${e.compare}, value: "${e.value}",${typePart} }`;
 }
 
-function buildWhereClause(filters: ProductFilters, first: number, after?: string): string {
+function buildWhereClause(filters: ProductFilters, first: number): string {
   const parts: string[] = [];
 
   parts.push(`first: ${first}`);
-  if (after) parts.push(`after: "${after}"`);
 
   const metaArray: MetaEntry[] = [];
 
@@ -79,10 +70,6 @@ function buildWhereClause(filters: ProductFilters, first: number, after?: string
 }
 
 const PRODUCT_FIELDS = `
-  pageInfo {
-    hasNextPage
-    endCursor
-  }
   edges {
     node {
       id
@@ -127,21 +114,14 @@ const PRODUCT_FIELDS = `
 
 export async function fetchProducts(
   filters: ProductFilters,
-  first = 10,
-  after?: string,
-): Promise<FetchProductsResult> {
-  const args = buildWhereClause(filters, first, after);
+  first = 100,
+): Promise<ProductNode[]> {
+  const args = buildWhereClause(filters, first);
   const query = `query { products(${args}) { ${PRODUCT_FIELDS} } }`;
 
   const data = await wpGraphqlClient.request<{
-    products: {
-      pageInfo: ProductsPageInfo;
-      edges: { node: ProductNode }[];
-    } | null;
+    products: { edges: { node: ProductNode }[] } | null;
   }>(query);
 
-  const products = data.products?.edges.map((e) => e.node) ?? [];
-  const pageInfo = data.products?.pageInfo ?? { hasNextPage: false, endCursor: null };
-
-  return { products, pageInfo };
+  return data.products?.edges.map((e) => e.node) ?? [];
 }

@@ -5,6 +5,8 @@ import { fetchProducts } from '@/lib/graphql/fetchProducts';
 import type { Languages } from '@/types';
 import ProductsClient from './ProductsClient';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: Languages }> }) {
   const { lang } = await params;
   const dict = getDictionary(lang);
@@ -19,9 +21,9 @@ export default async function ProductsPage({ params }: { params: Promise<{ lang:
   const dict = getDictionary(lang);
   const sdk = getSdk(wpGraphqlClient);
 
-  const [{ allOrigin }, { products: initialProducts, pageInfo }] = await Promise.all([
+  const [{ allOrigin }, initialProducts] = await Promise.all([
     sdk.GetOrigins(),
-    fetchProducts({}, 10),
+    fetchProducts({}),
   ]);
 
   const origins = allOrigin?.edges.map((e) => e.node) ?? [];
@@ -31,7 +33,6 @@ export default async function ProductsPage({ params }: { params: Promise<{ lang:
       lang={lang}
       dict={dict}
       initialProducts={initialProducts}
-      initialPageInfo={pageInfo}
       origins={origins}
     />
   );
