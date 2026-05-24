@@ -28,7 +28,7 @@ export default function HomeClient({ dict }: officeProps) {
     <div>
 
       {/* Hero */}
-      <div className="w-full aspect-[2.5/1] flex justify-center items-center relative">
+      <div className="w-full aspect-square md:aspect-[2.5/1] flex justify-center items-center relative">
         <Swiper
           modules={[Autoplay]}
           slidesPerView={1}
@@ -73,14 +73,14 @@ export default function HomeClient({ dict }: officeProps) {
 
 
       {/* Page Content */}
-      <div className="flex flex-col items-center gap-20 px-40 pt-20">
+      <div className="flex flex-col items-center gap-20 px-4 md:px-40 pt-20">
         <SectionDivider title={dict.menu.products} />
-        <div className="w-full flex flex-col gap-5 px-20">
+        <div className="w-full flex flex-col gap-5 px-2 md:px-20">
           {productCategories.map((cat, idx) => (
             <Link
               href={cat.link}
               key={idx}
-              className="w-full flex justify-between items-center py-10 px-16 rounded-full overflow-hidden relative group"
+              className="w-full flex justify-between items-center py-10 px-2 md:px-16 rounded-full overflow-hidden relative group"
             >
               {/* Background image */}
               <img src={cat.image} alt={cat.title} className="absolute top-0 left-0 w-full h-full object-cover" />
@@ -90,7 +90,7 @@ export default function HomeClient({ dict }: officeProps) {
                 <img src="/ornament.svg" alt={cat.title} className="w-12 invert opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 {/* Category name */}
-                <h3 className="text-5xl text-white font-Mirza leading-none">
+                <h3 className="text-5xl text-white font-Mirza leading-none translate-y-[15%]">
                   {dict.products[cat.title]}
                 </h3>
                 

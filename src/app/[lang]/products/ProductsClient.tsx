@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useTransition } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import type { Languages, Dictionary } from '@/types';
-import type { ProductNode, ProductsPageInfo, ProductFilters } from '@/lib/graphql/fetchProducts';
+import type { ProductNode } from '@/lib/graphql/fetchProducts';
 import type { GetOriginsQuery } from '@/lib/graphql/generated';
-import { fetchProductsAction } from './actions';
 import SectionDivider from '@/components/SectionDivider';
 
 type OriginNode = NonNullable<GetOriginsQuery['allOrigin']>['edges'][number]['node'];
@@ -14,7 +13,6 @@ type Props = {
   lang: Languages;
   dict: Dictionary;
   initialProducts: ProductNode[];
-  initialPageInfo: ProductsPageInfo;
   origins: OriginNode[];
 };
 
@@ -44,19 +42,24 @@ const INITIAL_FILTERS: FilterState = {
   originIds: [],
 };
 
-function filtersToPayload(f: FilterState): ProductFilters {
-  return {
-    priceMin: f.priceMin ? Number(f.priceMin) : undefined,
-    priceMax: f.priceMax ? Number(f.priceMax) : undefined,
-    widthMin: f.widthMin ? Number(f.widthMin) : undefined,
-    widthMax: f.widthMax ? Number(f.widthMax) : undefined,
-    heightMin: f.heightMin ? Number(f.heightMin) : undefined,
-    heightMax: f.heightMax ? Number(f.heightMax) : undefined,
-    type: f.type || undefined,
-    condition: f.condition || undefined,
-    availableOnly: f.availableOnly || undefined,
-    originIds: f.originIds.length > 0 ? f.originIds : undefined,
-  };
+function applyLocalFilters(products: ProductNode[], f: FilterState): ProductNode[] {
+  return products.filter((p) => {
+    const d = p.productDetail;
+    if (f.priceMin !== '' && (d?.price ?? 0) < Number(f.priceMin)) return false;
+    if (f.priceMax !== '' && (d?.price ?? Infinity) > Number(f.priceMax)) return false;
+    if (f.widthMin !== '' && (d?.width ?? 0) < Number(f.widthMin)) return false;
+    if (f.widthMax !== '' && (d?.width ?? Infinity) > Number(f.widthMax)) return false;
+    if (f.heightMin !== '' && (d?.length ?? 0) < Number(f.heightMin)) return false;
+    if (f.heightMax !== '' && (d?.length ?? Infinity) > Number(f.heightMax)) return false;
+    if (f.type && d?.type !== f.type) return false;
+    if (f.condition && d?.condition !== f.condition) return false;
+    if (f.availableOnly && Array.isArray(d?.soldOut) && d.soldOut.length > 0) return false;
+    if (f.originIds.length > 0) {
+      const productOriginIds = p.origin?.edges.map((e) => e.node.databaseId) ?? [];
+      if (!f.originIds.some((id) => productOriginIds.includes(id))) return false;
+    }
+    return true;
+  });
 }
 
 function buildOriginTree(origins: OriginNode[]) {
@@ -84,51 +87,26 @@ export default function ProductsClient({
   lang,
   dict,
   initialProducts,
-  initialPageInfo,
   origins,
 }: Props) {
   const t = dict.productsPage;
-  const isRtl = lang === 'fa';
 
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState<FilterState>(INITIAL_FILTERS);
-  const [products, setProducts] = useState<ProductNode[]>(initialProducts);
-  const [pageInfo, setPageInfo] = useState<ProductsPageInfo>(initialPageInfo);
-  const [isPending, startTransition] = useTransition();
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const products = useMemo(() => applyLocalFilters(initialProducts, filters), [initialProducts, filters]);
   const [openTile, setOpenTile] = useState<string | null>(null);
   const filterBarRef = useRef<HTMLDivElement | null>(null);
 
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-
   const { roots: rootOrigins, children: originChildren } = buildOriginTree(origins);
 
-  const applyFilters = useCallback(() => {
-    setOpenTile(null);
-    startTransition(async () => {
-      const result = await fetchProductsAction(filtersToPayload(filters), 10, undefined);
-      setProducts(result.products);
-      setPageInfo(result.pageInfo);
-      setAppliedFilters(filters);
-    });
-  }, [filters]);
+  const conditions = useMemo(() => {
+    const vals = new Set(initialProducts.map((p) => p.productDetail?.condition).filter(Boolean) as string[]);
+    return Array.from(vals).sort();
+  }, [initialProducts]);
 
-  const loadMore = useCallback(async () => {
-    if (!pageInfo.hasNextPage || isLoadingMore || isPending) return;
-    setIsLoadingMore(true);
-    try {
-      const result = await fetchProductsAction(
-        filtersToPayload(appliedFilters),
-        10,
-        pageInfo.endCursor ?? undefined,
-      );
-      setProducts((prev) => [...prev, ...result.products]);
-      setPageInfo(result.pageInfo);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [pageInfo, isLoadingMore, isPending, appliedFilters]);
+  const types = useMemo(() => {
+    const vals = new Set(initialProducts.map((p) => p.productDetail?.type).filter(Boolean) as string[]);
+    return Array.from(vals).sort();
+  }, [initialProducts]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -139,17 +117,6 @@ export default function ProductsClient({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    if (!sentinelRef.current) return;
-    observerRef.current?.disconnect();
-    observerRef.current = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) loadMore(); },
-      { threshold: 0.1 },
-    );
-    observerRef.current.observe(sentinelRef.current);
-    return () => observerRef.current?.disconnect();
-  }, [loadMore]);
 
   function toggleOrigin(id: number) {
     setFilters((prev) => ({
@@ -180,13 +147,11 @@ export default function ProductsClient({
   return (
     <div className="min-h-screen py-20 relative">
 
-      <SectionDivider title={dict.menu.products} classes="px-40 my-10" />
+      <SectionDivider title={dict.menu.products} classes="px-4 md:px-40 my-10" />
 
       {/* Products */}
-      <div className="px-10 pb-16">
-        {isPending ? (
-          <ProductGridSkeleton />
-        ) : products.length === 0 ? (
+      <div className="px-2 md:px-10 pb-16">
+        {products.length === 0 ? (
           <div className="h-screen flex flex-col justify-center items-center text-stone-400">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-4 opacity-40">
               <circle cx="11" cy="11" r="8" />
@@ -202,16 +167,11 @@ export default function ProductsClient({
           </div>
         )}
 
-        <div ref={sentinelRef} className="flex items-center justify-center">
-          {isLoadingMore && (
-            <div className="w-6 h-6 my-10 border-2 border-stone-300 border-t-stone-700 rounded-full animate-spin" />
-          )}
-        </div>
       </div>
 
       {/* Filter bar */}
-      <div ref={filterBarRef} className="sticky bottom-1 w-[calc(100vw-2rem)] mx-auto">
-        <div className="flex border border-stone-800 rounded-full bg-customLightSand">
+      <div ref={filterBarRef} className="sticky bottom-1 w-[calc(100vw-.5rem)] md:w-[calc(100vw-2rem)] mx-auto">
+        <div className="flex border border-stone-800 rounded-4xl md:rounded-full bg-customLightSand">
           {filterTiles.map((tile, idx) => {
             const active = filterIsActive(filters, tile.keys);
             const isOpen = openTile === tile.id;
@@ -222,7 +182,9 @@ export default function ProductsClient({
                 <button
                   type="button"
                   onClick={() => setOpenTile(isOpen ? null : tile.id)}
-                  className={`w-full flex flex-col items-center justify-center gap-3 py-3 px-2 ${idx != 0 ? "border-l" : ""} border-stone-800 relative
+                  className={`w-full h-full flex flex-col items-center justify-center gap-3 py-3 px-2
+                    ${(idx != 0 && lang == "en") ? "border-l" : ""} border-stone-800 relative
+                    ${(idx != 0 && lang == "fa") ? "border-r" : ""}
                     text-xs font-medium text-black cursor-pointer`}
                 >
                   <TileIcon id={tile.id} />
@@ -240,30 +202,24 @@ export default function ProductsClient({
                     {tile.id === 'price' && (
                       <DualRangeSlider
                         min={0} max={10000} step={100}
-                        minVal={filters.priceMin ? Number(filters.priceMin) : 0}
-                        maxVal={filters.priceMax ? Number(filters.priceMax) : 10000}
-                        onMinChange={(v) => setFilters((p) => ({ ...p, priceMin: v === 0 ? '' : String(v) }))}
-                        onMaxChange={(v) => setFilters((p) => ({ ...p, priceMax: v === 10000 ? '' : String(v) }))}
+                        committed={{ min: filters.priceMin !== '' ? Number(filters.priceMin) : 0, max: filters.priceMax !== '' ? Number(filters.priceMax) : 10000 }}
+                        onConfirm={(min, max) => setFilters((p) => ({ ...p, priceMin: min === 0 ? '' : String(min), priceMax: max === 10000 ? '' : String(max) }))}
                         formatValue={(v) => `$${v.toLocaleString()}`}
                       />
                     )}
                     {tile.id === 'width' && (
                       <DualRangeSlider
-                        min={0} max={1000} step={10}
-                        minVal={filters.widthMin ? Number(filters.widthMin) : 0}
-                        maxVal={filters.widthMax ? Number(filters.widthMax) : 1000}
-                        onMinChange={(v) => setFilters((p) => ({ ...p, widthMin: v === 0 ? '' : String(v) }))}
-                        onMaxChange={(v) => setFilters((p) => ({ ...p, widthMax: v === 1000 ? '' : String(v) }))}
+                        min={50} max={3000} step={10}
+                        committed={{ min: filters.widthMin !== '' ? Number(filters.widthMin) : 500, max: filters.widthMax !== '' ? Number(filters.widthMax) : 3000 }}
+                        onConfirm={(min, max) => setFilters((p) => ({ ...p, widthMin: min === 500 ? '' : String(min), widthMax: max === 3000 ? '' : String(max) }))}
                         formatValue={(v) => `${v} cm`}
                       />
                     )}
                     {tile.id === 'height' && (
                       <DualRangeSlider
-                        min={0} max={1000} step={10}
-                        minVal={filters.heightMin ? Number(filters.heightMin) : 0}
-                        maxVal={filters.heightMax ? Number(filters.heightMax) : 1000}
-                        onMinChange={(v) => setFilters((p) => ({ ...p, heightMin: v === 0 ? '' : String(v) }))}
-                        onMaxChange={(v) => setFilters((p) => ({ ...p, heightMax: v === 1000 ? '' : String(v) }))}
+                        min={50} max={3000} step={10}
+                        committed={{ min: filters.heightMin !== '' ? Number(filters.heightMin) : 500, max: filters.heightMax !== '' ? Number(filters.heightMax) : 3000 }}
+                        onConfirm={(min, max) => setFilters((p) => ({ ...p, heightMin: min === 500 ? '' : String(min), heightMax: max === 3000 ? '' : String(max) }))}
                         formatValue={(v) => `${v} cm`}
                       />
                     )}
@@ -273,9 +229,7 @@ export default function ProductsClient({
                         onChange={(v) => setFilters((p) => ({ ...p, type: v }))}
                         options={[
                           { value: '', label: t.all },
-                          { value: 'carpet', label: t.typeCarpet },
-                          { value: 'kilim', label: t.typeKilim },
-                          { value: 'bag', label: t.typeBag },
+                          ...types.map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) })),
                         ]}
                       />
                     )}
@@ -285,9 +239,7 @@ export default function ProductsClient({
                         onChange={(v) => setFilters((p) => ({ ...p, condition: v }))}
                         options={[
                           { value: '', label: t.all },
-                          { value: 'antique', label: t.conditionAntique },
-                          { value: 'semi-antique', label: t.conditionSemiAntique },
-                          { value: 'new', label: t.conditionNew },
+                          ...conditions.map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) })),
                         ]}
                       />
                     )}
@@ -320,7 +272,9 @@ export default function ProductsClient({
           <button
             type="button"
             onClick={resetFilters}
-            className="text-sm text-black/60 hover:text-black/90 font-medium uppercase transition duration-200 px-5 border-l border-black cursor-pointer"
+            className={`text-sm text-black/60 hover:text-black/90 font-medium uppercase transition duration-200 px-1 md:px-5 
+              ${lang === 'en' ? 'border-l' : 'border-r'} border-black cursor-pointer
+            `}
           >
             {t.resetFilters}
           </button>
@@ -344,24 +298,40 @@ const POPOVER_WIDTH: Record<string, string> = {
 // ---------- dual range slider ----------
 function DualRangeSlider({
   min, max, step,
-  minVal, maxVal,
-  onMinChange, onMaxChange,
+  committed,
+  onConfirm,
   formatValue,
 }: {
   min: number; max: number; step: number;
-  minVal: number; maxVal: number;
-  onMinChange: (v: number) => void;
-  onMaxChange: (v: number) => void;
+  committed: { min: number; max: number };
+  onConfirm: (min: number, max: number) => void;
   formatValue: (v: number) => string;
 }) {
-  const minPct = ((minVal - min) / (max - min)) * 100;
-  const maxPct = ((maxVal - min) / (max - min)) * 100;
+  const [draft, setDraft] = useState({ min: committed.min, max: committed.max });
+
+  const minPct = ((draft.min - min) / (max - min)) * 100;
+  const maxPct = ((draft.max - min) / (max - min)) * 100;
+  // Midpoint between thumbs — each input's clip region stops here
+  const midPct = (minPct + maxPct) / 2;
+
+  const dirty = draft.min !== committed.min || draft.max !== committed.max;
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex justify-between text-xs text-stone-500">
-        <span>{formatValue(minVal)}</span>
-        <span>{formatValue(maxVal)}</span>
+      <div className="flex justify-between items-center text-xs text-stone-500">
+        <span>{formatValue(draft.min)}</span>
+        {dirty && (
+          <button
+            type="button"
+            onClick={() => onConfirm(draft.min, draft.max)}
+            className="w-6 h-6 flex items-center justify-center rounded-full bg-stone-800 text-white hover:bg-stone-600 transition-colors cursor-pointer animate-bounce"
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="m5 13 4 4L19 7" />
+            </svg>
+          </button>
+        )}
+        <span>{formatValue(draft.max)}</span>
       </div>
       <div className="relative h-5 flex items-center">
         {/* track */}
@@ -371,30 +341,22 @@ function DualRangeSlider({
           className="absolute h-1.5 rounded-full bg-stone-800"
           style={{ left: `${minPct}%`, right: `${100 - maxPct}%` }}
         />
-        {/* min thumb */}
-        <input
-          type="range"
-          min={min} max={max} step={step}
-          value={minVal}
-          onChange={(e) => {
-            const v = Number(e.target.value);
-            if (v <= maxVal) onMinChange(v);
-          }}
-          className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer range-thumb"
-          style={{ zIndex: minVal >= maxVal - step ? 5 : 3 }}
-        />
-        {/* max thumb */}
-        <input
-          type="range"
-          min={min} max={max} step={step}
-          value={maxVal}
-          onChange={(e) => {
-            const v = Number(e.target.value);
-            if (v >= minVal) onMaxChange(v);
-          }}
-          className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer range-thumb"
-          style={{ zIndex: 4 }}
-        />
+        {/* min thumb — clipped to left half so it never intercepts clicks meant for max */}
+        <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - midPct}% 0 0)` }}>
+          <input
+            type="range" min={min} max={max} step={step} value={draft.min}
+            onChange={(e) => { const v = Number(e.target.value); if (v <= draft.max) setDraft((d) => ({ ...d, min: v })); }}
+            className="absolute w-full h-full appearance-none bg-transparent cursor-pointer range-thumb"
+          />
+        </div>
+        {/* max thumb — clipped to right half */}
+        <div className="absolute inset-0" style={{ clipPath: `inset(0 0 0 ${midPct}%)` }}>
+          <input
+            type="range" min={min} max={max} step={step} value={draft.max}
+            onChange={(e) => { const v = Number(e.target.value); if (v >= draft.min) setDraft((d) => ({ ...d, max: v })); }}
+            className="absolute w-full h-full appearance-none bg-transparent cursor-pointer range-thumb"
+          />
+        </div>
       </div>
     </div>
   );
@@ -616,13 +578,13 @@ function ProductCard({
           </div>
         )}
         {soldOut && (
-          <span className="absolute top-0 right-0 text-amber-800 text-xs font-semibold m-3 uppercase">
+          <span className="absolute top-0 right-0 text-amber-800 text-xs font-semibold m-3 px-2 py-1 uppercase bg-white/80 rounded-full">
             {t.soldOut}
           </span>
         )}
       </div>
 
-      <div className="absolute bottom-0 w-full h-24 flex justify-between items-end gap-2 p-4 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="absolute bottom-0 w-full h-24 flex justify-between items-end gap-2 p-4 bg-black/70 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex flex-col gap-1">
           {detail?.width && detail?.length && (
             <span className="text-lg text-stone-200 font-light leading-none mb-1">
@@ -656,19 +618,3 @@ function ProductCard({
 }
 
 // ---------- skeleton ----------
-function ProductGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden border border-stone-100 bg-white">
-          <div className="aspect-square bg-stone-100 animate-pulse" />
-          <div className="p-4 flex flex-col gap-3">
-            <div className="h-4 bg-stone-100 rounded animate-pulse w-3/4" />
-            <div className="h-3 bg-stone-100 rounded animate-pulse w-1/2" />
-            <div className="h-4 bg-stone-100 rounded animate-pulse w-1/3 mt-auto" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}

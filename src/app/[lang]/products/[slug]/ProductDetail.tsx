@@ -75,23 +75,23 @@ export default function ProductDetail({ product, lang, dict }: Props) {
   return (
     <div className={`min-h-screen pt-24 pb-16 ${isRtl ? 'font-Mirza' : ''}`} dir={isRtl ? 'rtl' : 'ltr'}>
 
-      <div className="px-6 md:px-16">
+      <div className="px-3 md:px-16">
 
         {/* Back link */}
         <Link
           href={`/${lang}/products`}
           className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-stone-600 hover:text-stone-800 transition-colors mb-8"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={isRtl ? 'rotate-180' : ''}>
             <path d="M19 12H5M12 5l-7 7 7 7" />
           </svg>
           {t.backToProducts}
         </Link>
 
-        <div className="flex items-start gap-6 relative">
+        <div className="flex flex-col-reverse md:flex-row items-start gap-6 relative">
 
           {/* Gallery */}
-          <div className="w-3/5 flex flex-col gap-4">
+          <div className="md:w-3/5 flex flex-col gap-4">
             {galleryImages.length > 0 ? (
               galleryImages.map((img, i) => (
                 <div key={img.id} className="relative w-full overflow-hidden">
@@ -120,7 +120,7 @@ export default function ProductDetail({ product, lang, dict }: Props) {
           </div>
 
           {/* Details */}
-          <div className="sticky top-24 w-2/5 flex flex-col gap-8">
+          <div className="md:sticky top-24 md:w-2/5 flex flex-col gap-4 md:gap-8">
 
             {/* Title + price + status */}
             <div className='w-full flex items-end justify-between'>

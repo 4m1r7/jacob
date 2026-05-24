@@ -49,7 +49,7 @@ export default function Header({ lang, dict }: pageProps) {
           duration: 0.1,
           ease: "linear",
         }}
-        className={`flex justify-between items-center px-10 transition-all border-black ${
+        className={`flex justify-between items-center px-4 md:px-10 transition-all border-black py-5 md:py-0 ${
           showScrolled ? "border-b-[.5px] duration-200" : "border-b-0 duration-75"
         }`}
       >
@@ -59,26 +59,26 @@ export default function Header({ lang, dict }: pageProps) {
           <img
             src="/logo.svg"
             alt="logo"
-            className="w-[5vw] opacity-0"
+            className="w-15 md:w-[5vw] opacity-0"
           />
           {showScrolled && (
             <motion.img
               layoutId="main-logo"
               src="/logo.svg"
               alt="logo"
-              className="absolute w-[3vw] brightness-0 saturate-100"
+              className="absolute w-15 md:w-[3vw] brightness-0 saturate-100"
               transition={{ duration: showScrolled ? .75 : 0, ease: "easeInOut" }}
             />
           )}
         </Link>
 
         {/* Menu */}
-        <nav className="w-fit flex items-center gap-6">
+        <nav className="w-fit flex items-center gap-4 md:gap-6">
           {menu.map((item) => (
             <Link
               key={item.link}
               href={`/${lang}/${item.link}`}
-              className={`text-2xl leading-none tracking-widest font-Mirza rtl:tracking-normal
+              className={`text-xl md:text-2xl leading-none tracking-widest font-Mirza rtl:tracking-normal translate-y-[15%]
                   ${showScrolled ? 'text-black' : 'text-white'}
                 `}
             >
@@ -87,7 +87,7 @@ export default function Header({ lang, dict }: pageProps) {
           ))}
           <Link
             href={switchPath}
-            className={`text-2xl font-Mirza leading-none tracking-widest ltr:tracking-normal
+            className={`text-xl md:text-2xl font-Mirza leading-none tracking-widest ltr:tracking-normal translate-y-[15%]
                 ${showScrolled ? 'text-black' : 'text-white'}
               `}
           >

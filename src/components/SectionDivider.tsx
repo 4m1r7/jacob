@@ -13,10 +13,10 @@ export default function Header({ title, logo, classes }: pageProps) {
       <div className="flex-grow h-[1px] bg-black" />
 
       {logo ? (
-        <img src="/logo.svg" alt="" className="w-60 invert px-24 py-2 rounded-full border-[1px] border-white" />
+        <img src="/logo.svg" alt="" className="w-45 md:w-60 invert px-16 md:px-24 py-2 rounded-full border-[1px] border-white" />
       ) : (
-        <h2 className="px-24 py-2 rounded-full border-[1px] border-black">
-          <div className="text-3xl font-Mirza font-medium leading-none translate-y-[15%]">
+        <h2 className="px-12 md:px-24 py-2 rounded-full border-[1px] border-black">
+          <div className="text-xl md:text-3xl font-Mirza font-medium leading-none translate-y-[15%]">
             {title}
           </div>
         </h2>
